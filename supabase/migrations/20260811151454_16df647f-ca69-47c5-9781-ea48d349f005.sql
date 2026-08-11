@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS memory_user_kind_value_key ON public.memory (user_id, kind, value);
