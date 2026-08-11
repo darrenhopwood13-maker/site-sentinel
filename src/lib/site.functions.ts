@@ -207,3 +207,25 @@ export const askOracle = createServerFn({ method: "POST" })
       .single();
     return { answer: await chatText(row?.value ?? "", data.question) };
   });
+
+export const transcribeOnly = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { audioBase64: string; filename: string }) => data)
+  .handler(async ({ data }) => {
+    const { transcribe } = await import("./openai.server");
+    const bytes = Uint8Array.from(atob(data.audioBase64), (c) => c.charCodeAt(0));
+    return { transcript: await transcribe(bytes, data.filename) };
+  });
+
+const _unusedAskOracleTail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { question: string }) => data)
+  .handler(async ({ data, context }) => {
+    const { chatText } = await import("./openai.server");
+    const { data: row } = await context.supabase
+      .from("settings")
+      .select("value")
+      .eq("key", "oracle_persona")
+      .single();
+    return { answer: await chatText(row?.value ?? "", data.question) };
+  });
