@@ -14,7 +14,271 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      entries: {
+        Row: {
+          captured_at: string
+          check_me: boolean
+          created_at: string
+          day: string
+          detail: Json
+          id: string
+          label: string
+          photo_path: string | null
+          section: string
+          source: string
+          user_id: string
+          zone: string
+        }
+        Insert: {
+          captured_at?: string
+          check_me?: boolean
+          created_at?: string
+          day?: string
+          detail?: Json
+          id?: string
+          label: string
+          photo_path?: string | null
+          section: string
+          source: string
+          user_id: string
+          zone: string
+        }
+        Update: {
+          captured_at?: string
+          check_me?: boolean
+          created_at?: string
+          day?: string
+          detail?: Json
+          id?: string
+          label?: string
+          photo_path?: string | null
+          section?: string
+          source?: string
+          user_id?: string
+          zone?: string
+        }
+        Relationships: []
+      }
+      findings: {
+        Row: {
+          captured_at: string
+          category: string
+          check_me: boolean
+          citation: string | null
+          created_at: string
+          day: string
+          entry_id: string | null
+          grade: string
+          id: string
+          line_1: string
+          line_2: string | null
+          line_3: string | null
+          photo_path: string | null
+          status: string
+          user_id: string
+          zone: string
+        }
+        Insert: {
+          captured_at?: string
+          category: string
+          check_me?: boolean
+          citation?: string | null
+          created_at?: string
+          day?: string
+          entry_id?: string | null
+          grade?: string
+          id?: string
+          line_1: string
+          line_2?: string | null
+          line_3?: string | null
+          photo_path?: string | null
+          status?: string
+          user_id: string
+          zone: string
+        }
+        Update: {
+          captured_at?: string
+          category?: string
+          check_me?: boolean
+          citation?: string | null
+          created_at?: string
+          day?: string
+          entry_id?: string | null
+          grade?: string
+          id?: string
+          line_1?: string
+          line_2?: string | null
+          line_3?: string | null
+          photo_path?: string | null
+          status?: string
+          user_id?: string
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "findings_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory: {
+        Row: {
+          created_at: string
+          hits: number
+          id: string
+          kind: string
+          last_used: string
+          payload: Json
+          user_id: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          hits?: number
+          id?: string
+          kind: string
+          last_used?: string
+          payload?: Json
+          user_id: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          hits?: number
+          id?: string
+          kind?: string
+          last_used?: string
+          payload?: Json
+          user_id?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          client_name: string | null
+          content: Json
+          created_at: string
+          day: string
+          id: string
+          kind: string
+          overall_grade: string | null
+          user_id: string
+        }
+        Insert: {
+          client_name?: string | null
+          content?: Json
+          created_at?: string
+          day?: string
+          id?: string
+          kind: string
+          overall_grade?: string | null
+          user_id: string
+        }
+        Update: {
+          client_name?: string | null
+          content?: Json
+          created_at?: string
+          day?: string
+          id?: string
+          kind?: string
+          overall_grade?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      snags: {
+        Row: {
+          captured_at: string
+          check_me: boolean
+          citation: string | null
+          close_out: string | null
+          created_at: string
+          day: string
+          description: string
+          entry_id: string | null
+          id: string
+          likely_cause: string | null
+          location: string
+          photo_path: string | null
+          rectification: string | null
+          severity: string
+          trade: string
+          user_id: string
+          verdict: string | null
+          zone: string
+        }
+        Insert: {
+          captured_at?: string
+          check_me?: boolean
+          citation?: string | null
+          close_out?: string | null
+          created_at?: string
+          day?: string
+          description: string
+          entry_id?: string | null
+          id?: string
+          likely_cause?: string | null
+          location: string
+          photo_path?: string | null
+          rectification?: string | null
+          severity?: string
+          trade: string
+          user_id: string
+          verdict?: string | null
+          zone: string
+        }
+        Update: {
+          captured_at?: string
+          check_me?: boolean
+          citation?: string | null
+          close_out?: string | null
+          created_at?: string
+          day?: string
+          description?: string
+          entry_id?: string | null
+          id?: string
+          likely_cause?: string | null
+          location?: string
+          photo_path?: string | null
+          rectification?: string | null
+          severity?: string
+          trade?: string
+          user_id?: string
+          verdict?: string | null
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snags_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
