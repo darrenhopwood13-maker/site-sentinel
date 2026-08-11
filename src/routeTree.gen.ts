@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OracleRouteImport } from './routes/oracle'
 import { Route as ReportsRouteImport } from './routes/reports'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OracleRoute = OracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -25,27 +31,31 @@ const ReportsRoute = ReportsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reports'
+  fullPaths: '/' | '/oracle' | '/reports'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reports'
-  id: '__root__' | '/' | '/reports'
+  to: '/' | '/oracle' | '/reports'
+  id: '__root__' | '/' | '/oracle' | '/reports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OracleRoute: typeof OracleRoute
   ReportsRoute: typeof ReportsRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oracle': {
+      id: '/oracle'
+      path: '/oracle'
+      fullPath: '/oracle'
+      preLoaderRoute: typeof OracleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OracleRoute: OracleRoute,
   ReportsRoute: ReportsRoute,
 }
 export const routeTree = rootRouteImport
