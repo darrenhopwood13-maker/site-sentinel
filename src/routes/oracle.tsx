@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { SignIn } from "@/components/SignIn";
 import { useSession } from "@/lib/day-data";
 import { DISCLAIMER } from "@/lib/site-log";
-import { askOracle, fileVoiceNote } from "@/lib/site.functions";
+import { askOracle, transcribeOnly } from "@/lib/site.functions";
 
 export const Route = createFileRoute("/oracle")({
   head: () => ({
@@ -54,8 +54,8 @@ function Oracle() {
       let bin = "";
       buf.forEach((b) => (bin += String.fromCharCode(b)));
       try {
-        const heard = await fileVoiceNote({
-          data: { audioBase64: btoa(bin), filename: "oracle.webm", zone: "Compound" },
+        const heard = await transcribeOnly({
+          data: { audioBase64: btoa(bin), filename: "oracle.webm" },
         });
         setQuestion(heard.transcript);
         const res = await askOracle({ data: { question: heard.transcript } });
