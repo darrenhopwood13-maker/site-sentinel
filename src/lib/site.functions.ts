@@ -19,7 +19,7 @@ export const analyzePhoto = createServerFn({ method: "POST" })
     const s = Object.fromEntries((settings ?? []).map((r) => [r.key, r.value]));
 
     const system = [
-      "You are instructReport's site photo analyst for a UK construction site.",
+      "You are instructBrain's site photo analyst for a UK construction site.",
       "Read the photo and return STRICT JSON only.",
       "Never guess: if you are not confident about any field, set confident=false so the site manager can confirm.",
       "Classify the photo into exactly one section of: Progress, Deliveries, Labour, Plant, Issues, Safety, Visitors, Photos.",
