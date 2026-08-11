@@ -18,13 +18,13 @@ import { analyzePhoto, fileVoiceNote } from "@/lib/site.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "instructReport — the daily site report writes itself" },
+      { title: "instructBrain — the daily site report writes itself" },
       {
         name: "description",
         content:
           "Tap, photo and voice capture for UK site managers. Zero typing, evidence on every finding, reports at 5pm.",
       },
-      { property: "og:title", content: "instructReport — the daily site report writes itself" },
+      { property: "og:title", content: "instructBrain — the daily site report writes itself" },
       {
         property: "og:description",
         content: "instructSite runs the job. instructBrain writes it up.",

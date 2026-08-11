@@ -9,13 +9,13 @@ import { askOracle, transcribeOnly } from "@/lib/site.functions";
 export const Route = createFileRoute("/oracle")({
   head: () => ({
     meta: [
-      { title: "Ask the Oracle — instructReport" },
+      { title: "Ask the Oracle — instructBrain" },
       {
         name: "description",
         content:
           "Speak a question and get site advice in the Oracle voice. Advisory only, never client-facing.",
       },
-      { property: "og:title", content: "Ask the Oracle — instructReport" },
+      { property: "og:title", content: "Ask the Oracle — instructBrain" },
       {
         property: "og:description",
         content: "One question, spoken. Advice only — it never touches client output.",

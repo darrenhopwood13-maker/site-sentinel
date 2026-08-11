@@ -10,13 +10,13 @@ import { generateReport } from "@/lib/site.functions";
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "5pm reports — instructReport" },
+      { title: "5pm reports — instructBrain" },
       {
         name: "description",
         content:
           "Customer progress, housekeeping condition and snag reports generated from today's site photos.",
       },
-      { property: "og:title", content: "5pm reports — instructReport" },
+      { property: "og:title", content: "5pm reports — instructBrain" },
       {
         property: "og:description",
         content: "Three reports, one photo engine. Graded Green, Amber, Red by zone.",
