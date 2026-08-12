@@ -14,6 +14,7 @@ import {
 } from "@/lib/day-data";
 import { SECTIONS, type Entry, type Section, type Zone } from "@/lib/site-log";
 import { analyzePhoto, fileVoiceNote } from "@/lib/site.functions";
+import { createSpeechSession } from "@/lib/speech";
 
 export const Route = createFileRoute("/")({
   head: () => ({
