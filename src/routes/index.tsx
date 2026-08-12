@@ -14,6 +14,7 @@ import {
 } from "@/lib/day-data";
 import { SECTIONS, type Entry, type Section, type Zone } from "@/lib/site-log";
 import { analyzePhoto, fileVoiceNote } from "@/lib/site.functions";
+import { createSpeechSession } from "@/lib/speech";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,7 +65,7 @@ function DayView() {
   const [sheet, setSheet] = useState<Section | null>(null);
   const [recording, setRecording] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const recorder = useRef<MediaRecorder | null>(null);
+  const voiceSession = useRef<{ stop: () => Promise<string> } | null>(null);
   const weather = useWeather();
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -116,37 +117,30 @@ function DayView() {
 
   const onVoice = async () => {
     if (recording) {
-      recorder.current?.stop();
       setRecording(false);
+      try {
+        const transcript = await voiceSession.current?.stop();
+        if (!transcript) {
+          setStatus("Nothing heard — try again.");
+          return;
+        }
+        setStatus("Filing voice note…");
+        const res = await fileVoiceNote({ data: { transcript, zone } });
+        setStatus(`${res.section}: ${res.transcript}`);
+        refresh();
+        setTimeout(() => setStatus(null), 5000);
+      } catch {
+        setStatus("Voice note failed — try again.");
+      }
       return;
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(stream);
-      const chunks: Blob[] = [];
-      mr.ondataavailable = (e) => chunks.push(e.data);
-      mr.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        setStatus("Filing voice note…");
-        const buf = new Uint8Array(await new Blob(chunks).arrayBuffer());
-        let bin = "";
-        buf.forEach((b) => (bin += String.fromCharCode(b)));
-        try {
-          const res = await fileVoiceNote({
-            data: { audioBase64: btoa(bin), filename: "note.webm", zone },
-          });
-          setStatus(`${res.section}: ${res.transcript}`);
-        } catch {
-          setStatus("Voice note failed — try again.");
-        }
-        refresh();
-        setTimeout(() => setStatus(null), 5000);
-      };
-      recorder.current = mr;
-      mr.start();
+      const session = createSpeechSession();
+      voiceSession.current = session;
+      session.start();
       setRecording(true);
     } catch {
-      setStatus("Microphone not available");
+      setStatus("Speech recognition not available in this browser");
     }
   };
 

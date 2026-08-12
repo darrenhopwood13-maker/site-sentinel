@@ -4,7 +4,8 @@ import { Logo } from "@/components/Logo";
 import { SignIn } from "@/components/SignIn";
 import { useSession } from "@/lib/day-data";
 import { DISCLAIMER } from "@/lib/site-log";
-import { askOracle, transcribeOnly } from "@/lib/site.functions";
+import { askOracle } from "@/lib/site.functions";
+import { createSpeechSession } from "@/lib/speech";
 
 export const Route = createFileRoute("/oracle")({
   head: () => ({
@@ -31,43 +32,40 @@ function Oracle() {
   const [question, setQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const recorder = useRef<MediaRecorder | null>(null);
+  const voiceSession = useRef<{ stop: () => Promise<string> } | null>(null);
 
   if (!ready) return <div className="min-h-screen bg-background" />;
   if (!session) return <SignIn />;
 
   const toggle = async () => {
     if (recording) {
-      recorder.current?.stop();
       setRecording(false);
-      return;
-    }
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mr = new MediaRecorder(stream);
-    const chunks: Blob[] = [];
-    mr.ondataavailable = (e) => chunks.push(e.data);
-    mr.onstop = async () => {
-      stream.getTracks().forEach((t) => t.stop());
-      setBusy(true);
-      setAnswer(null);
-      const buf = new Uint8Array(await new Blob(chunks).arrayBuffer());
-      let bin = "";
-      buf.forEach((b) => (bin += String.fromCharCode(b)));
       try {
-        const heard = await transcribeOnly({
-          data: { audioBase64: btoa(bin), filename: "oracle.webm" },
-        });
-        setQuestion(heard.transcript);
-        const res = await askOracle({ data: { question: heard.transcript } });
+        const transcript = await voiceSession.current?.stop();
+        if (!transcript) {
+          setAnswer("Nothing heard — try again.");
+          return;
+        }
+        setBusy(true);
+        setAnswer(null);
+        setQuestion(transcript);
+        const res = await askOracle({ data: { question: transcript } });
         setAnswer(res.answer);
       } catch {
         setAnswer("The Oracle could not be reached. Try again.");
+      } finally {
+        setBusy(false);
       }
-      setBusy(false);
-    };
-    recorder.current = mr;
-    mr.start();
-    setRecording(true);
+      return;
+    }
+    try {
+      const session = createSpeechSession();
+      voiceSession.current = session;
+      session.start();
+      setRecording(true);
+    } catch {
+      setAnswer("Speech recognition is not available in this browser.");
+    }
   };
 
   return (
