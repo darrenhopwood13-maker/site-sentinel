@@ -65,7 +65,7 @@ function DayView() {
   const [sheet, setSheet] = useState<Section | null>(null);
   const [recording, setRecording] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const recorder = useRef<MediaRecorder | null>(null);
+  const voiceSession = useRef<{ stop: () => Promise<string> } | null>(null);
   const weather = useWeather();
   const [showWelcome, setShowWelcome] = useState(false);
 
