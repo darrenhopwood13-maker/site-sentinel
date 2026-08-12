@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CaptureBar } from "@/components/CaptureBar";
 import { Logo } from "@/components/Logo";
 import { SignIn } from "@/components/SignIn";
-import { ZoneStrip } from "@/components/ZoneStrip";
+import { ZonePicker } from "@/components/ZonePicker";
 import { CHIPS } from "@/lib/chips";
 import {
   useDayActions,
@@ -83,6 +83,13 @@ function DayView() {
   const { addTap, confirmEntry, removeEntry, uploadPhoto, refresh } = useDayActions();
 
   const list = entries.data ?? [];
+  const timeline = useMemo(
+    () =>
+      [...list].sort(
+        (a, b) => new Date(a.captured_at).getTime() - new Date(b.captured_at).getTime(),
+      ),
+    [list],
+  );
   const covered = useMemo(
     () => new Set(list.filter((e) => e.source === "photo").map((e) => e.zone)),
     [list],
@@ -175,9 +182,9 @@ function DayView() {
 
       <section className="mt-5">
         <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-          Guided sweep — {covered.size}/6 zones covered
+          Guided sweep
         </p>
-        <ZoneStrip zone={zone} covered={covered} onSelect={setZone} />
+        <ZonePicker zone={zone} covered={covered} onSelect={setZone} />
       </section>
 
       <section className="mt-5 grid grid-cols-2 gap-3">
@@ -200,9 +207,9 @@ function DayView() {
 
       <section className="mt-7">
         <p className="mb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-          Today's log
+          Today's timeline
         </p>
-        {list.length === 0 && (
+        {timeline.length === 0 && (
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">How the day flows</p>
             <ol className="mt-2 list-inside list-decimal text-sm text-muted-foreground">
@@ -212,11 +219,47 @@ function DayView() {
             </ol>
           </div>
         )}
-        <div className="space-y-3">
-          {list.map((e) => (
-            <EntryCard key={e.id} entry={e} onConfirm={confirmEntry} onRemove={removeEntry} />
-          ))}
-        </div>
+        {timeline.length > 0 && (
+          <div className="relative pl-20">
+            <span className="absolute left-[4.25rem] top-2 bottom-2 w-px bg-border" />
+            <div className="space-y-3">
+              {timeline.map((e) => (
+                <div key={e.id} className="relative">
+                  <span className="absolute -left-20 top-4 w-14 text-right text-xs font-bold text-muted-foreground">
+                    {new Date(e.captured_at).toLocaleTimeString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span
+                    className={`absolute -left-[3.25rem] top-5 h-3 w-3 rounded-full ring-4 ring-background ${
+                      e.source === "photo"
+                        ? "bg-primary"
+                        : e.source === "voice"
+                          ? "bg-grade-amber"
+                          : "bg-grade-green"
+                    }`}
+                  />
+                  <EntryCard entry={e} onConfirm={confirmEntry} onRemove={removeEntry} />
+                </div>
+              ))}
+              <div className="relative">
+                <span className="absolute -left-[3.25rem] top-4 h-3 w-3 rounded-full border-2 border-primary bg-background ring-4 ring-background" />
+                <p className="py-3 text-sm font-semibold text-muted-foreground">
+                  {timeline.length} logged so far — ready for Reports
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <Link
+          to="/reports"
+          search={{ generate: "customer" }}
+          className="mt-4 flex h-16 w-full items-center justify-center rounded-2xl bg-primary text-base font-bold text-primary-foreground active:scale-[0.99]"
+        >
+          Generate my reports now
+        </Link>
       </section>
 
       {sheet && (
