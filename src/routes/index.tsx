@@ -191,9 +191,14 @@ function DayView() {
           Today's log
         </p>
         {list.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Nothing logged yet. Tap a button, take a photo or speak.
-          </p>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">How the day flows</p>
+            <ol className="mt-2 list-inside list-decimal text-sm text-muted-foreground">
+              <li>Pick your zone at the top.</li>
+              <li>Tap a button, take a photo, or record a voice note.</li>
+              <li>Tap Reports when you are ready to share.</li>
+            </ol>
+          </div>
         )}
         <div className="space-y-3">
           {list.map((e) => (
