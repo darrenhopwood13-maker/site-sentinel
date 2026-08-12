@@ -260,8 +260,46 @@ function DayView() {
         </div>
       )}
 
+      {showWelcome && <WelcomeOverlay onDismiss={dismissWelcome} />}
+
       <CaptureBar onPhoto={onPhoto} onVoice={onVoice} recording={recording} />
     </main>
+  );
+}
+
+function WelcomeOverlay({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6">
+        <p className="text-xl font-extrabold">How instructBrain works</p>
+        <ol className="mt-4 space-y-4 text-sm text-foreground">
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              1
+            </span>
+            <span>Pick your zone at the top of the day view.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              2
+            </span>
+            <span>Tap a button, take a photo, or record a voice note — no typing needed.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              3
+            </span>
+            <span>Tap Reports at the end of the day to generate the customer, housekeeping and snag reports.</span>
+          </li>
+        </ol>
+        <button
+          onClick={onDismiss}
+          className="mt-6 h-14 w-full rounded-2xl bg-primary text-base font-bold text-primary-foreground"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
   );
 }
 
