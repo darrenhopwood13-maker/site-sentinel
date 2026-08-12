@@ -87,7 +87,10 @@ export async function chatJSON(
       ],
     }),
   });
-  if (!res.ok) throw new Error(`Vision/LLM request failed (${res.status})`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Vision/LLM request failed (${res.status}): ${body}`);
+  }
   const data = (await res.json()) as { choices: { message: { content: string } }[] };
   return JSON.parse(data.choices[0]?.message?.content ?? "{}") as Record<string, unknown>;
 }
@@ -108,7 +111,10 @@ export async function chatText(system: string, user: string, model?: string): Pr
       ],
     }),
   });
-  if (!res.ok) throw new Error(`LLM request failed (${res.status})`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`LLM request failed (${res.status}): ${body}`);
+  }
   const data = (await res.json()) as { choices: { message: { content: string } }[] };
   return data.choices[0]?.message?.content ?? "";
 }
