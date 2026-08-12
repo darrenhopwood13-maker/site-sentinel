@@ -216,7 +216,9 @@ function DayView() {
             <p className="text-lg font-extrabold">
               {sheet} · {zone}
             </p>
-            <p className="mb-4 text-xs text-muted-foreground">One tap logs it. No typing.</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Tap a chip to log it under {sheet} in {zone}.
+            </p>
             <div className="flex flex-wrap gap-2">
               {CHIPS[sheet].map((c) => (
                 <button
