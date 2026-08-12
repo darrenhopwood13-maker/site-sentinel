@@ -66,6 +66,18 @@ function DayView() {
   const [status, setStatus] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const weather = useWeather();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("instructbrain-welcome-seen") !== "1") {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  const dismissWelcome = () => {
+    localStorage.setItem("instructbrain-welcome-seen", "1");
+    setShowWelcome(false);
+  };
 
   const entries = useDayEntries(!!userId);
   const { addTap, confirmEntry, removeEntry, uploadPhoto, refresh } = useDayActions();
@@ -191,9 +203,14 @@ function DayView() {
           Today's log
         </p>
         {list.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Nothing logged yet. Tap a button, take a photo or speak.
-          </p>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">How the day flows</p>
+            <ol className="mt-2 list-inside list-decimal text-sm text-muted-foreground">
+              <li>Pick your zone at the top.</li>
+              <li>Tap a button, take a photo, or record a voice note.</li>
+              <li>Tap Reports when you are ready to share.</li>
+            </ol>
+          </div>
         )}
         <div className="space-y-3">
           {list.map((e) => (
@@ -211,7 +228,9 @@ function DayView() {
             <p className="text-lg font-extrabold">
               {sheet} · {zone}
             </p>
-            <p className="mb-4 text-xs text-muted-foreground">One tap logs it. No typing.</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Tap a chip to log it under {sheet} in {zone}.
+            </p>
             <div className="flex flex-wrap gap-2">
               {CHIPS[sheet].map((c) => (
                 <button
@@ -241,8 +260,46 @@ function DayView() {
         </div>
       )}
 
+      {showWelcome && <WelcomeOverlay onDismiss={dismissWelcome} />}
+
       <CaptureBar onPhoto={onPhoto} onVoice={onVoice} recording={recording} />
     </main>
+  );
+}
+
+function WelcomeOverlay({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6">
+        <p className="text-xl font-extrabold">How instructBrain works</p>
+        <ol className="mt-4 space-y-4 text-sm text-foreground">
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              1
+            </span>
+            <span>Pick your zone at the top of the day view.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              2
+            </span>
+            <span>Tap a button, take a photo, or record a voice note — no typing needed.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              3
+            </span>
+            <span>Tap Reports at the end of the day to generate the customer, housekeeping and snag reports.</span>
+          </li>
+        </ol>
+        <button
+          onClick={onDismiss}
+          className="mt-6 h-14 w-full rounded-2xl bg-primary text-base font-bold text-primary-foreground"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
   );
 }
 

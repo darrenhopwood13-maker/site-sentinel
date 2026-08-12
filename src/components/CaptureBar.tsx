@@ -46,7 +46,7 @@ export function CaptureBar({
           to="/reports"
           className="flex h-16 w-20 items-center justify-center rounded-2xl border border-primary/60 text-sm font-bold text-primary"
         >
-          5pm
+          Reports
         </Link>
       </div>
     </div>

@@ -10,13 +10,13 @@ import { generateReport } from "@/lib/site.functions";
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "5pm reports — instructBrain" },
+      { title: "Reports — instructBrain" },
       {
         name: "description",
         content:
           "Customer progress, housekeeping condition and snag reports generated from today's site photos.",
       },
-      { property: "og:title", content: "5pm reports — instructBrain" },
+      { property: "og:title", content: "Reports — instructBrain" },
       {
         property: "og:description",
         content: "Three reports, one photo engine. Graded Green, Amber, Red by zone.",
@@ -69,7 +69,10 @@ function Reports() {
           Day view
         </Link>
       </header>
-      <h1 className="mt-4 text-2xl font-extrabold">5pm reports</h1>
+      <h1 className="mt-4 text-2xl font-extrabold">Reports</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Built from today's photos, voice notes and taps. Generate them whenever you are ready to share.
+      </p>
 
       <section className="mt-5 grid grid-cols-3 gap-2">
         {ZONES.map((z) => {
@@ -121,6 +124,9 @@ function Reports() {
       )}
 
       <section className="mt-7 space-y-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+          Generate report
+        </p>
         {(
           [
             ["customer", "Customer progress report"],
