@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OracleRouteImport } from './routes/oracle'
 import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as ApiPublicTestLlmRouteImport } from './routes/api/public/test-llm'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,44 +28,35 @@ const ReportsRoute = ReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTestLlmRoute = ApiPublicTestLlmRouteImport.update({
-  id: '/api/public/test-llm',
-  path: '/api/public/test-llm',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
-  '/api/public/test-llm': typeof ApiPublicTestLlmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
-  '/api/public/test-llm': typeof ApiPublicTestLlmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/oracle': typeof OracleRoute
   '/reports': typeof ReportsRoute
-  '/api/public/test-llm': typeof ApiPublicTestLlmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/oracle' | '/reports' | '/api/public/test-llm'
+  fullPaths: '/' | '/oracle' | '/reports'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/oracle' | '/reports' | '/api/public/test-llm'
-  id: '__root__' | '/' | '/oracle' | '/reports' | '/api/public/test-llm'
+  to: '/' | '/oracle' | '/reports'
+  id: '__root__' | '/' | '/oracle' | '/reports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OracleRoute: typeof OracleRoute
   ReportsRoute: typeof ReportsRoute
-  ApiPublicTestLlmRoute: typeof ApiPublicTestLlmRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,13 +82,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/test-llm': {
-      id: '/api/public/test-llm'
-      path: '/api/public/test-llm'
-      fullPath: '/api/public/test-llm'
-      preLoaderRoute: typeof ApiPublicTestLlmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -106,7 +89,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OracleRoute: OracleRoute,
   ReportsRoute: ReportsRoute,
-  ApiPublicTestLlmRoute: ApiPublicTestLlmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
