@@ -69,7 +69,10 @@ function Reports() {
           Day view
         </Link>
       </header>
-      <h1 className="mt-4 text-2xl font-extrabold">5pm reports</h1>
+      <h1 className="mt-4 text-2xl font-extrabold">Reports</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Built from today's photos, voice notes and taps. Generate them whenever you are ready to share.
+      </p>
 
       <section className="mt-5 grid grid-cols-3 gap-2">
         {ZONES.map((z) => {
