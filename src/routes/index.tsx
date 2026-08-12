@@ -66,6 +66,18 @@ function DayView() {
   const [status, setStatus] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const weather = useWeather();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("instructbrain-welcome-seen") !== "1") {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  const dismissWelcome = () => {
+    localStorage.setItem("instructbrain-welcome-seen", "1");
+    setShowWelcome(false);
+  };
 
   const entries = useDayEntries(!!userId);
   const { addTap, confirmEntry, removeEntry, uploadPhoto, refresh } = useDayActions();
