@@ -124,6 +124,9 @@ function Reports() {
       )}
 
       <section className="mt-7 space-y-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+          Generate report
+        </p>
         {(
           [
             ["customer", "Customer progress report"],
