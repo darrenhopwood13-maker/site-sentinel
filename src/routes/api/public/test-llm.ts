@@ -12,7 +12,8 @@ export const Route = createFileRoute("/api/public/test-llm")({
           });
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
-          return new Response(JSON.stringify({ ok: false, error: msg }), {
+          const body = (e as any)?.responseBody ?? null;
+          return new Response(JSON.stringify({ ok: false, error: msg, body }), {
             status: 500,
             headers: { "content-type": "application/json" },
           });
