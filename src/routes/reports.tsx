@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { SignIn } from "@/components/SignIn";
 import { usePhotoUrl, useDayFindings, useDaySnags, useSession } from "@/lib/day-data";
@@ -8,6 +8,9 @@ import { DISCLAIMER, ZONES } from "@/lib/site-log";
 import { generateReport } from "@/lib/site.functions";
 
 export const Route = createFileRoute("/reports")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    generate: typeof search.generate === "string" ? (search.generate as Kind) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Reports — instructBrain" },
@@ -30,11 +33,33 @@ type Kind = "customer" | "housekeeping" | "snag";
 
 function Reports() {
   const { session, ready } = useSession();
+  const { generate } = Route.useSearch();
   const findings = useDayFindings(!!session);
   const snags = useDaySnags(!!session);
   const [busy, setBusy] = useState<Kind | null>(null);
   const [output, setOutput] = useState<{ kind: Kind; body: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const autoRan = useRef(false);
+
+  const run = async (kind: Kind) => {
+    setBusy(kind);
+    setError(null);
+    try {
+      const res = await generateReport({ data: { kind } });
+      setOutput({ kind, body: res.body });
+    } catch {
+      setError("Report could not be generated. Try again.");
+    }
+    setBusy(null);
+  };
+
+  useEffect(() => {
+    if (!session || autoRan.current) return;
+    if (generate !== "customer" && generate !== "housekeeping" && generate !== "snag") return;
+    autoRan.current = true;
+    void run(generate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, generate]);
 
   if (!ready) return <div className="min-h-screen bg-background" />;
   if (!session) return <SignIn />;
@@ -47,18 +72,6 @@ function Reports() {
     if (g.includes("red")) return "red";
     if (g.includes("amber")) return "amber";
     return "green";
-  };
-
-  const run = async (kind: Kind) => {
-    setBusy(kind);
-    setError(null);
-    try {
-      const res = await generateReport({ data: { kind } });
-      setOutput({ kind, body: res.body });
-    } catch {
-      setError("Report could not be generated. Try again.");
-    }
-    setBusy(null);
   };
 
   return (
