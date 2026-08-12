@@ -23,8 +23,9 @@ export function createSpeechSession(): SpeechSession {
 
   recognition.onresult = (event: SpeechRecognitionEvent) => {
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        final += event.results[i][0].transcript;
+      const alt = event.results[i]?.[0];
+      if (event.results[i]?.isFinal && alt) {
+        final += alt.transcript;
       }
     }
   };
