@@ -7,48 +7,20 @@ type Provider = {
   supportsAudio: boolean;
 };
 
+// Lovable AI (built-in). Gemini handles both text and vision.
+const MODEL = "google/gemini-3.6-flash";
+
 function getProvider(): Provider {
-  const genericKey = process.env["LLM_API_KEY"];
-  const genericBase = process.env["LLM_BASE_URL"];
-  const deepseekKey = process.env["DEEPSEEK_API_KEY"];
-  const openaiKey = process.env["OPENAI_API_KEY"];
-
-  if (genericKey) {
-    return {
-      baseUrl: genericBase || "https://api.openai.com/v1",
-      key: genericKey,
-      model: process.env["LLM_MODEL"] || "gpt-4o",
-      visionModel: process.env["LLM_VISION_MODEL"] || "gpt-4o",
-      supportsVision: true,
-      supportsAudio: !!openaiKey,
-    };
-  }
-
-  if (deepseekKey) {
-    return {
-      baseUrl: "https://api.deepseek.com/v1",
-      key: deepseekKey,
-      model: process.env["DEEPSEEK_MODEL"] || "deepseek-chat",
-      visionModel: process.env["DEEPSEEK_VISION_MODEL"] || null,
-      supportsVision: !!process.env["DEEPSEEK_VISION_MODEL"],
-      supportsAudio: false,
-    };
-  }
-
-  if (openaiKey) {
-    return {
-      baseUrl: "https://api.openai.com/v1",
-      key: openaiKey,
-      model: process.env["OPENAI_MODEL"] || "gpt-4o",
-      visionModel: process.env["OPENAI_VISION_MODEL"] || "gpt-4o",
-      supportsVision: true,
-      supportsAudio: true,
-    };
-  }
-
-  throw new Error(
-    "No LLM API key configured. Add DEEPSEEK_API_KEY, OPENAI_API_KEY, or LLM_API_KEY.",
-  );
+  const key = process.env["LOVABLE_API_KEY"];
+  if (!key) throw new Error("Lovable AI is not configured (missing LOVABLE_API_KEY).");
+  return {
+    baseUrl: "https://ai.gateway.lovable.dev/v1",
+    key,
+    model: MODEL,
+    visionModel: MODEL,
+    supportsVision: true,
+    supportsAudio: false,
+  };
 }
 
 export async function chatJSON(
@@ -76,7 +48,8 @@ export async function chatJSON(
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${p.key}`,
+      "Lovable-API-Key": p.key,
+      "X-Lovable-AIG-SDK": "fetch",
     },
     body: JSON.stringify({
       model: chosenModel,
@@ -101,7 +74,8 @@ export async function chatText(system: string, user: string, model?: string): Pr
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${p.key}`,
+      "Lovable-API-Key": p.key,
+      "X-Lovable-AIG-SDK": "fetch",
     },
     body: JSON.stringify({
       model: model ?? p.model,
