@@ -44,6 +44,7 @@ export function CaptureBar({
         </button>
         <Link
           to="/reports"
+          search={{ generate: undefined }}
           className="flex h-16 w-20 items-center justify-center rounded-2xl border border-primary/60 text-sm font-bold text-primary"
         >
           Reports

@@ -9,7 +9,7 @@ import { generateReport } from "@/lib/site.functions";
 
 export const Route = createFileRoute("/reports")({
   validateSearch: (search: Record<string, unknown>) => ({
-    generate: typeof search.generate === "string" ? (search.generate as Kind) : undefined,
+    generate: typeof search["generate"] === "string" ? (search["generate"] as Kind) : undefined,
   }),
   head: () => ({
     meta: [
