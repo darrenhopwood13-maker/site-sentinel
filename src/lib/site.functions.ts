@@ -30,13 +30,32 @@ export const analyzePhoto = createServerFn({ method: "POST" })
       'JSON shape: {"section":string,"label":string,"quantity":string|null,"supplier":string|null,"people":string[],"confident":boolean,"housekeeping":[{"category":string,"status":"clear"|"finding","grade":"green"|"amber"|"red","line_1":string,"line_2":string,"line_3":string,"citation":string|null}],"snags":[{"trade":string,"location":string,"verdict":string,"description":string,"severity":"cosmetic"|"functional"|"structural","likely_cause":string,"rectification":string,"close_out":string,"citation":string|null}]}',
     ].join("\n");
 
-    const result = (await chatJSON(
-      system,
-      `Zone: ${data.zone}. Analyse this site photo.`,
-      [signed.data.signedUrl],
-    )) as any;
+    let result: any;
+    let visionFailed = false;
+    try {
+      result = await chatJSON(system, `Zone: ${data.zone}. Analyse this site photo.`, [
+        signed.data.signedUrl,
+      ]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("Vision is not configured")) {
+        visionFailed = true;
+        result = {
+          section: "Photos",
+          label: "Photo uploaded (vision not available with this DeepSeek model)",
+          quantity: null,
+          supplier: null,
+          people: [],
+          confident: false,
+          housekeeping: [],
+          snags: [],
+        };
+      } else {
+        throw e;
+      }
+    }
 
-    const confident = result.confident === true;
+    const confident = !visionFailed && result.confident === true;
     const label: string = result.label || "Site photo";
 
     await supabase
@@ -97,18 +116,15 @@ export const analyzePhoto = createServerFn({ method: "POST" })
           { onConflict: "user_id,kind,value" },
         );
 
-    return { label, confident, findings: findings.length, snags: snags.length };
+    return { label, confident, findings: findings.length, snags: snags.length, visionFailed };
   });
 
 export const fileVoiceNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { audioBase64: string; filename: string; zone: string }) => data)
+  .inputValidator((data: { transcript: string; zone: string }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { transcribe, chatJSON } = await import("./openai.server");
-
-    const bytes = Uint8Array.from(atob(data.audioBase64), (c) => c.charCodeAt(0));
-    const text = await transcribe(bytes, data.filename);
+    const { chatJSON } = await import("./openai.server");
 
     const filed = (await chatJSON(
       [
@@ -116,7 +132,7 @@ export const fileVoiceNote = createServerFn({ method: "POST" })
         "Return STRICT JSON: {\"section\":one of Progress|Deliveries|Labour|Plant|Issues|Safety|Visitors|Photos,\"label\":short clean sentence,\"confident\":boolean}.",
         "Never invent detail that is not in the note. If ambiguous, set confident=false.",
       ].join("\n"),
-      `Zone: ${data.zone}. Voice note: "${text}"`,
+      `Zone: ${data.zone}. Voice note: "${data.transcript}"`,
     )) as any;
 
     const { data: row, error } = await supabase
@@ -126,15 +142,15 @@ export const fileVoiceNote = createServerFn({ method: "POST" })
         section: filed.section || "Issues",
         zone: data.zone,
         source: "voice",
-        label: filed.label || text,
-        detail: { transcript: text },
+        label: filed.label || data.transcript,
+        detail: { transcript: data.transcript },
         check_me: filed.confident !== true,
       })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
 
-    return { id: row.id, transcript: text, section: filed.section, confident: filed.confident === true };
+    return { id: row.id, transcript: data.transcript, section: filed.section, confident: filed.confident === true };
   });
 
 export const generateReport = createServerFn({ method: "POST" })
@@ -207,13 +223,3 @@ export const askOracle = createServerFn({ method: "POST" })
       .single();
     return { answer: await chatText(row?.value ?? "", data.question) };
   });
-
-export const transcribeOnly = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { audioBase64: string; filename: string }) => data)
-  .handler(async ({ data }) => {
-    const { transcribe } = await import("./openai.server");
-    const bytes = Uint8Array.from(atob(data.audioBase64), (c) => c.charCodeAt(0));
-    return { transcript: await transcribe(bytes, data.filename) };
-  });
-
